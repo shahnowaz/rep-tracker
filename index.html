@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rep Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f5fb;--tx:#14151f;--mu:#6b6f85;--cd:#fff;--ln:#e3e5f0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10111a;--tx:#f3f4fa;--mu:#9a9eb8;--cd:#1b1d2b;--ln:#2a2d42}}
+:root[data-theme="dark"]{--bg:#10111a;--tx:#f3f4fa;--mu:#9a9eb8;--cd:#1b1d2b;--ln:#2a2d42}
+*{box-sizing:border-box;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--tx);font:16px/1.4 Barlow,system-ui,sans-serif;min-height:100vh;padding:14px 10px 110px;max-width:640px;margin:0 auto}
+h1,h2,.big{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:800;letter-spacing:.5px}
+h1{font-size:40px;line-height:1}
+.sub{color:var(--mu);margin:6px 0 18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{border:0;border-radius:22px;padding:16px;min-height:130px;color:#fff;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 8px 20px -8px var(--a);transition:transform .15s}
+.tile:active{transform:scale(.95)}
+.tile:focus-visible,.btn:focus-visible,.fab:focus-visible,input:focus-visible{outline:3px solid var(--tx);outline-offset:2px}
+.xc{background:var(--a);color:#fff;border-radius:10px;padding:5px 8px 6px;margin-bottom:5px;animation:pop .25s}
+.xh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px}
+.xh .n{font-weight:600;font-size:14px}
+.xh .pr{font-size:10px;padding:0 6px}
+.ents{display:flex;flex-wrap:wrap;gap:3px}
+.ent{position:relative;background:rgba(0,0,0,.22);border:1px solid transparent;border-radius:6px;padding:1px 14px 1px 4px;line-height:1.05}
+.ent small{display:block;font-size:8px;color:rgba(255,255,255,.85)}
+.ent.mxw{background:#16a34a;border-color:#fff;color:#fff}
+.ent.mxw small{color:#d8f5e2}
+.ent.mxw .del{color:#fff}
+.ent b{font-family:"Barlow Condensed",sans-serif;font-size:12px}
+.ent .del{position:absolute;top:0;right:0;font-size:9px;padding:1px 3px;color:#fff}
+.tile .big{font-size:27px;line-height:1}
+.tile small{opacity:.92;font-size:13px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bkp{width:100%;margin-top:16px;padding:14px;border-radius:16px;border:2px dashed var(--ln);background:var(--cd);color:var(--tx);font:600 17px Barlow,system-ui,sans-serif;cursor:pointer}
+.bkp:active{transform:scale(.97)}
+.stat{text-align:center;color:var(--mu);font-size:13px;margin-top:10px}
+.ttl{font-size:24px;font-weight:800}
+.back{border:0;background:var(--cd);color:var(--tx);width:42px;height:42px;border-radius:14px;font-size:20px;cursor:pointer;border:1px solid var(--ln)}
+.hero{border-radius:24px;padding:18px;color:#fff;background:linear-gradient(135deg,var(--a),var(--b));margin-bottom:18px}
+.hero h2{font-size:34px}
+.stats{display:flex;gap:10px;margin-top:10px}
+.stats div{flex:1;background:rgba(255,255,255,.2);border-radius:14px;padding:8px 10px}
+.stats b{display:block;font-size:22px;font-family:"Barlow Condensed",sans-serif}
+.date{font-weight:600;color:var(--mu);margin:16px 4px 8px}
+.row{background:var(--cd);border:1px solid var(--ln);border-left:6px solid var(--a);border-radius:14px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;animation:pop .25s}
+.row .n{flex:1;font-weight:600}
+.row .v{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:20px}
+.pr{background:#ffc83d;color:#3a2a00;font-size:12px;font-weight:600;border-radius:99px;padding:2px 8px}
+.del{border:0;background:none;color:var(--mu);font-size:18px;cursor:pointer;padding:4px 8px}
+.empty{text-align:center;color:var(--mu);padding:40px 10px;border:2px dashed var(--ln);border-radius:20px}
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:64px;height:64px;border-radius:50%;border:0;font-size:34px;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 10px 24px -6px var(--a);transition:transform .15s}
+.fab:active{transform:rotate(90deg) scale(.9)}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;z-index:5}
+.sheet.on{display:flex}
+.panel{background:var(--cd);width:100%;max-width:640px;margin:0 auto;border-radius:26px 26px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px));animation:up .25s}
+.panel h2{font-size:28px;margin-bottom:10px}
+label{display:block;font-size:14px;color:var(--mu);margin:10px 0 4px}
+input{width:100%;font:inherit;font-size:18px;padding:12px;border-radius:14px;border:2px solid var(--ln);background:var(--bg);color:var(--tx)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;margin-top:16px;border:0;border-radius:16px;padding:15px;font:800 20px "Barlow Condensed",sans-serif;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--a),var(--b))}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{border:1px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:99px;padding:4px 12px;font-size:14px;cursor:pointer}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:600;z-index:9;animation:pop .25s}
+@keyframes pop{from{transform:scale(.9);opacity:0}}
+@keyframes up{from{transform:translateY(60px);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="sheet" id="sheet"><div class="panel" id="panel"></div></div>
+<script>
+var G=[
+["tri","Triceps","💪","#ff5c8a","#ff8a5c"],
+["del","Delts","🔥","#ffb020","#ff6a18"],
+["che","Chest","🦍","#ff3d54","#b81d6a"],
+["bac","Back","🦅","#2d9cff","#5b3df5"],
+["bic","Biceps","⚡","#12d6a0","#0a8fe0"],
+["arm","Arms","🤜","#b05cf5","#ec4899"],
+["nec","Neck","🐂","#8ad11a","#0f9d58"],
+["leg","Legs & Core","🦵","#ff8a1c","#e8b400"]];
+var logs=[],cur=null,KEY="rep-tracker-v1",PAL=["#e11d63","#2563eb","#d97706","#7c3aed","#dc2626","#c026d3","#4f46e5","#ea580c","#0891b2","#9333ea"];
+try{logs=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){logs=[]}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(logs))}catch(e){}}
+var sheetUrl="",pend=[],statTxt="",busy=false,again=false,fz=false;
+try{sheetUrl=(function(u){return u&&/\/exec$/.test(u)?u:""})(localStorage.getItem("rep-url"))||"https://script.google.com/macros/s/AKfycbzTcE3Pzm-dGwdI9iD0fwvanF2nL8EV0BlT-5ZkgihVmTZK6scr0XmL3t_69YWq7tbP/exec";pend=JSON.parse(localStorage.getItem("rep-pend")||"[]");
+if(!localStorage.getItem("rep-seed")){pend=logs.map(function(x){return{action:"add",id:x.id,d:x.d,g:gi(x.g)[1],ex:x.ex,w:x.w,r:x.r}});localStorage.setItem("rep-seed","1");localStorage.setItem("rep-pend",JSON.stringify(pend))}}catch(e){}
+function savePend(){try{localStorage.setItem("rep-pend",JSON.stringify(pend))}catch(e){}}
+function setStat(t){statTxt=t;var s=document.getElementById("stat");if(s)s.textContent=t}
+function api(o){var q=Object.keys(o).map(function(k){return encodeURIComponent(k)+"="+encodeURIComponent(o[k])}).join("&");return fetch(sheetUrl+(sheetUrl.indexOf("?")<0?"?":"&")+q).then(function(r){return r.json()})}
+function track(o){if(!sheetUrl)return;pend.push(o);savePend();sync()}
+function sync(f){
+if(!sheetUrl)return;
+if(busy){again=true;if(f)fz=true;return}
+if(f||fz){fz=false;logs.forEach(function(x){pend.push({action:"add",id:x.id,d:x.d,g:gi(x.g)[1],ex:x.ex,w:x.w,r:x.r})});savePend()}
+busy=true;setStat("Syncing…");
+pend.slice().reduce(function(p,o){return p.then(function(){return api(o)}).then(function(){pend.shift();savePend()})},Promise.resolve())
+.then(function(){return api({action:"list"})})
+.then(function(rows){if(!Array.isArray(rows))throw new Error("Unexpected reply from sheet script");
+logs=rows.map(function(r){var g=G.filter(function(x){return x[1]===r.g})[0];return{id:r.id,g:g?g[0]:G[0][0],ex:String(r.ex),w:Number(r.w),r:Number(r.r),d:String(r.d)}});
+save();setStat("Synced with Google Sheet at "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}));
+if(!document.getElementById("sheet").classList.contains("on")){var y=window.scrollY;if(cur)page(cur);else home();window.scrollTo(0,y)}})
+.catch(function(err){setStat("Sync failed ("+(err&&err.message?err.message:"unknown")+"). Saved on this device.")})
+.then(function(){busy=false;if(again){again=false;sync()}})}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function fmt(d){var p=d.split("-");return new Date(p[0],p[1]-1,p[2]).toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short",year:"numeric"})}
+function gi(id){return G.filter(function(g){return g[0]===id})[0]}
+function theme(g){return"--a:"+g[3]+";--b:"+g[4]}
+function home(){
+cur=null;
+var h='<h1>Rep Tracker™</h1><p class="sub">Designed by Shahnowaz Ahmed</p><div class="grid">';
+G.forEach(function(g){
+var l=logs.filter(function(x){return x.g===g[0]});
+var last=l.length?l.map(function(x){return x.d}).sort().pop():null;
+h+='<button class="tile" style="'+theme(g)+'" data-g="'+g[0]+'"><span><span class="big">'+esc(g[1])+'</span><br><small>'+(l.length?l.length+' sets · last '+fmt(last).split(",")[1].trim().slice(0,6):'No sets yet')+'</small></span></button>'});
+document.getElementById("app").innerHTML=h+'</div><button class="bkp" id="syn">'+(sheetUrl?'Google Sheet sync: on':'Connect Google Sheet')+'</button><button class="bkp" id="snc">Sync now</button><p class="stat" id="stat">'+esc(statTxt)+'</p>';
+document.getElementById("syn").onclick=syncPanel;
+document.getElementById("snc").onclick=function(){if(!sheetUrl){syncPanel();return}sync(true)};
+document.querySelectorAll(".tile").forEach(function(b){b.onclick=function(){page(b.dataset.g)}});
+window.scrollTo(0,0)}
+function backup(){
+if(!logs.length){toast("Nothing to back up yet");return}
+var rows=[["Date","Muscle group","Exercise","Weight (kg)","Reps"]];
+logs.slice().sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:a.id-b.id}).forEach(function(x){rows.push([x.d,gi(x.g)[1],x.ex,x.w,x.r])});
+var csv="\ufeff"+rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"'}).join(",")}).join("\r\n");
+var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="rep-tracker-backup-"+today()+".csv";document.body.appendChild(a);a.click();a.remove();toast("Backup downloaded")}
+function syncPanel(){
+var p=document.getElementById("panel");p.setAttribute("style","--a:#16a34a;--b:#0ea5e9");
+p.innerHTML='<h2>Google Sheet sync</h2><label for="u">Paste your web app link</label><input id="u" type="text" autocomplete="off" autocapitalize="off" value="'+esc(sheetUrl)+'" placeholder="https://script.google.com/macros/s/.../exec"><button class="btn" id="us">'+(sheetUrl?'Update link':'Connect and sync')+'</button>'+(sheetUrl?'<button class="btn" id="ud" style="background:#6b6f85">Disconnect</button>':'');
+document.getElementById("sheet").classList.add("on");
+document.getElementById("us").onclick=function(){var u=document.getElementById("u").value.trim();if(u.indexOf("https://script.google.com/")!==0||!/\/exec$/.test(u)){toast("Link must end with /exec");return}
+sheetUrl=u;try{localStorage.setItem("rep-url",u)}catch(e){}
+pend=logs.map(function(x){return{action:"add",id:x.id,d:x.d,g:gi(x.g)[1],ex:x.ex,w:x.w,r:x.r}});savePend();closeSheet();home();sync();toast("Connecting…")};
+var d=document.getElementById("ud");if(d)d.onclick=function(){sheetUrl="";try{localStorage.removeItem("rep-url")}catch(e){}pend=[];savePend();closeSheet();setStat("");home();toast("Disconnected")}}
+function page(id){
+cur=id;var g=gi(id),l=logs.filter(function(x){return x.g===id});
+var vol=l.reduce(function(s,x){return s+x.w*x.r},0),best=l.reduce(function(m,x){return Math.max(m,x.w)},0);
+var pb={};l.forEach(function(x){pb[x.ex.toLowerCase()]=Math.max(pb[x.ex.toLowerCase()]||0,x.w)});
+var h='<div class="top"><button class="back" aria-label="Back" id="bk">←</button><h2 class="ttl">'+esc(g[1])+'</h2></div>';
+if(!l.length)h+='<div class="empty">Nothing logged yet.<br>Tap the + button to add your first exercise.</div>';
+var ex={};l.forEach(function(x){var k=x.ex.toLowerCase();(ex[k]=ex[k]||{k:k,n:x.ex,a:[]}).a.push(x)});
+var sd=function(d){var p=d.split("-");return new Date(p[0],p[1]-1,p[2]).toLocaleDateString(undefined,{day:"numeric",month:"short"})};
+Object.keys(ex).map(function(k){var e=ex[k];e.a.sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:a.id-b.id});return e}).sort(function(a,b){var la=a.a[a.a.length-1],lb=b.a[b.a.length-1];return lb.d===la.d?lb.id-la.id:(lb.d<la.d?-1:1)}).forEach(function(e){
+var c=PAL[Object.keys(ex).indexOf(e.k)%PAL.length];h+='<div class="xc" style="--a:'+c+'"><div class="xh"><span class="n">'+esc(e.n)+'</span></div><div class="ents">';
+var mw=pb[e.k];e.a.forEach(function(x){h+='<div class="ent'+(x.w===mw?' mxw':'')+'"><small>'+sd(x.d)+'</small><b>'+x.w+'kg × '+x.r+'</b><button class="del" aria-label="Delete set" data-id="'+x.id+'">✕</button></div>'});
+h+='</div></div>'});
+h+='<button class="fab" style="'+theme(g)+'" id="add" aria-label="Add workout">+</button>';
+document.getElementById("app").innerHTML=h;
+document.getElementById("bk").onclick=home;
+document.getElementById("add").onclick=openSheet;
+document.querySelectorAll(".del").forEach(function(b){b.onclick=function(){logs=logs.filter(function(x){return x.id!=b.dataset.id});save();track({action:"del",id:b.dataset.id});page(id);toast("Set deleted")}});
+window.scrollTo(0,0)}
+function openSheet(){
+var g=gi(cur),names=[];
+logs.filter(function(x){return x.g===cur}).slice().reverse().forEach(function(x){if(names.indexOf(x.ex)<0)names.push(x.ex)});
+var p=document.getElementById("panel");p.setAttribute("style",theme(g));
+p.innerHTML='<h2>Add to '+esc(g[1])+'</h2><label for="ex">Exercise</label><input id="ex" placeholder="e.g. Rope pushdown" autocomplete="off"><div class="chips">'+names.slice(0,6).map(function(n){return'<button class="chip" data-n="'+esc(n)+'">'+esc(n)+'</button>'}).join("")+'</div><div class="two"><div><label for="w">Weight (kg)</label><input id="w" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" autocomplete="off" enterkeyhint="next"></div><div><label for="r">Reps</label><input id="r" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="done"></div></div><label for="d">Date</label><input id="d" type="date" value="'+today()+'"><button class="btn" id="sv">Save set</button>';
+document.getElementById("sheet").classList.add("on");
+p.querySelectorAll(".chip").forEach(function(c){c.onclick=function(){document.getElementById("ex").value=c.dataset.n;document.getElementById("w").focus()}});
+document.getElementById("sv").onclick=function(){
+var ex=document.getElementById("ex").value.trim(),w=parseFloat(document.getElementById("w").value.replace(",",".")),r=parseInt(document.getElementById("r").value,10),d=document.getElementById("d").value||today();
+if(!ex||isNaN(w)||isNaN(r)||r<1){toast("Add exercise, weight and reps");return}
+var nid=Date.now();logs.push({id:nid,g:cur,ex:ex,w:w,r:r,d:d});save();track({action:"add",id:nid,d:d,g:gi(cur)[1],ex:ex,w:w,r:r});closeSheet();page(cur);toast("Saved "+ex+" "+w+" kg × "+r)};
+document.getElementById("w").oninput=function(){this.value=this.value.replace(/[^0-9.,]/g,"")};document.getElementById("r").oninput=function(){this.value=this.value.replace(/[^0-9]/g,"")};setTimeout(function(){document.getElementById("ex").focus()},50)}
+function closeSheet(){document.getElementById("sheet").classList.remove("on")}
+document.getElementById("sheet").onclick=function(e){if(e.target.id==="sheet")closeSheet()};
+function toast(m){var t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove()},2000)}
+home();sync();document.addEventListener("visibilitychange",function(){if(!document.hidden)sync()});
+</script>
+</body>
+</html>
