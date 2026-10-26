@@ -18,6 +18,7 @@ h1{font-size:40px;line-height:1}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .tile{border:0;border-radius:22px;padding:16px;min-height:130px;color:#fff;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 8px 20px -8px var(--a);transition:transform .15s}
 .tile:active{transform:scale(.95)}
+.grid .tile:last-child:nth-child(odd){grid-column:1/-1;min-height:96px}
 .tile:focus-visible,.btn:focus-visible,.fab:focus-visible,input:focus-visible{outline:3px solid var(--tx);outline-offset:2px}
 .xc{background:var(--a);color:#fff;border-radius:10px;padding:5px 8px 6px;margin-bottom:5px;animation:pop .25s}
 .xh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px}
@@ -81,7 +82,7 @@ var G=[
 ["bic","Biceps","⚡","#12d6a0","#0a8fe0"],
 ["arm","Arms","🤜","#b05cf5","#ec4899"],
 ["nec","Neck","🐂","#8ad11a","#0f9d58"],
-["leg","Legs & Core","🦵","#ff8a1c","#e8b400"]];
+["leg","Legs","🦵","#0d9488","#115e59"],["cor","Core","","#64748b","#1e293b"]];
 var logs=[],cur=null,KEY="rep-tracker-v1",PAL=["#e11d63","#2563eb","#d97706","#7c3aed","#dc2626","#c026d3","#4f46e5","#ea580c","#0891b2","#9333ea"];
 try{logs=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){logs=[]}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(logs))}catch(e){}}
@@ -100,7 +101,7 @@ busy=true;setStat("Syncing…");
 pend.slice().reduce(function(p,o){return p.then(function(){return api(o)}).then(function(){pend.shift();savePend()})},Promise.resolve())
 .then(function(){return api({action:"list"})})
 .then(function(rows){if(!Array.isArray(rows))throw new Error("Unexpected reply from sheet script");
-logs=rows.map(function(r){var g=G.filter(function(x){return x[1]===r.g})[0];return{id:r.id,g:g?g[0]:G[0][0],ex:String(r.ex),w:Number(r.w),r:Number(r.r),d:String(r.d)}});
+logs=rows.map(function(r){var g=G.filter(function(x){return x[1]===r.g||(r.g==="Legs & Core"&&x[0]==="leg")})[0];return{id:r.id,g:g?g[0]:G[0][0],ex:String(r.ex),w:Number(r.w),r:Number(r.r),d:String(r.d)}});
 save();setStat("Synced with Google Sheet at "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}));
 if(!document.getElementById("sheet").classList.contains("on")){var y=window.scrollY;if(cur)page(cur);else home();window.scrollTo(0,y)}})
 .catch(function(err){setStat("Sync failed ("+(err&&err.message?err.message:"unknown")+"). Saved on this device.")})
